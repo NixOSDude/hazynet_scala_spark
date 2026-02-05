@@ -1,10 +1,10 @@
-**🏗️ Technical Log: HazyNet "Lighthouse" Node Setup**
+### **🏗️ Technical Log: HazyNet "Lighthouse" Node Setup**
 
 **Environment:** Ubuntu 22.04 LTS (Headless) | **Hardware:** Dell Laptop (Server)
 
 **Goal:** Establish a Master Node for a Heterogeneous Spark Cluster.
 
-### ---
+### 
 
 **Phase 1: The JVM Foundation**
 
@@ -46,9 +46,7 @@
 * **Reasoning:** \* **Tail Recursion:** We used the @tailrec annotation to ensure the compiler optimizes the function into a loop. This prevents a StackOverflowError when processing massive datasets, which is a hallmark of senior-level functional programming.  
   * **Spark-Submit:** Running the job via spark-submit verified that the **Driver** could initialize, the **BlockManager** could allocate memory, and the **TaskScheduler** could execute our code successfully.
 
-## ---
-
-**📊 Summary of Infrastructure**
+### **📊 Summary of Infrastructure**
 
 | Component | Version | Role |
 | :---- | :---- | :---- |
@@ -57,4 +55,3 @@
 | **Scala** | 2.12.18 | Primary Programming Language |
 | **sbt** | 1.10.x | Build and Dependency Manager |
 
-### 
