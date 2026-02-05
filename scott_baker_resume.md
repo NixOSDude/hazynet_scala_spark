@@ -8,7 +8,7 @@
 
 * **Technical Evolution:** Mastered Apache Spark 3.5.x internals and Pure Functional Programming in Scala; engineered a multi-node "HazyNet" standalone cluster to simulate enterprise-grade data processing.
 * **Systems Maintenance:** Maintaining a hardened Linux environment, practicing advanced shell scripting, VM-based network orchestration, and security best practices.
-* **Certifications:** Earned **Databricks Certified Associate Developer for Apache Spark (Scala)** and maintained **AWS Cloud Practitioner** status.
+* **Certifications:** Earned **Databricks Certified Associate Developer for Apache Spark (Scala)** and maintained **AWS Solutions Architect** status.
 
 ---
 
