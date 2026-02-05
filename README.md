@@ -55,3 +55,10 @@ spark-submit \
 ### 📜 Dissertation: Why  Matters
 
 In distributed systems, efficiency isn't just about speed—it's about **cost and scalability**. By implementing linear-time algorithms and avoiding unnecessary shuffles, I ensure that data pipelines remain performant regardless of dataset size.
+
+## Development Workflow
+1. **Code:** Edit Scala files in WSL/VS Code.
+2. **Deploy:** Run `./spark-submit-cluster.sh`.
+3. **Monitor:** Watch execution at `http://192.168.68.56:8080` (Cluster UI) and `http://localhost:4040` (Job UI).
+
+**Note:** The `deploy-mode client` ensures the driver runs on the Ultra 7 (Muscle) while the heavy lifting is distributed.
