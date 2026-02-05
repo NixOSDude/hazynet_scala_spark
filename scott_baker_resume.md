@@ -4,7 +4,7 @@
 ---
 
 ## 🚀 PROFESSIONAL SUMMARY & RECENT FOCUS
-**December 2022 – Present** *Managing a long-term medical disability while aggressively evolving my technical stack. Currently seeking a remote role in Security Analysis, Vulnerability Management, or Data Systems Engineering.*
+**December 2022 – Present** *Managing a long-term medical disability while aggressively evolving my technical stack. Currently seeking a remote role in Data Systems Engineering with Apache Spark(scala).*
 
 * **Technical Evolution:** Mastered Apache Spark 3.5.x internals and Pure Functional Programming in Scala; engineered a multi-node "HazyNet" standalone cluster to simulate enterprise-grade data processing.
 * **Systems Maintenance:** Maintaining a hardened Linux environment, practicing advanced shell scripting, VM-based network orchestration, and security best practices.
