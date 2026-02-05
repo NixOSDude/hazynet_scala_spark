@@ -55,11 +55,3 @@ spark-submit \
 ### 📜 Dissertation: Why  Matters
 
 In distributed systems, efficiency isn't just about speed—it's about **cost and scalability**. By implementing linear-time algorithms and avoiding unnecessary shuffles, I ensure that data pipelines remain performant regardless of dataset size.
-
-
-
-
-
-Are we ready to pivot back to the **Ultra 7** to get the Windows Spark environment configured so we can finalize the "Bond" between the two nodes?
-
-```
