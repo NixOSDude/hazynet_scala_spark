@@ -1,5 +1,3 @@
-## ---
-
 **🏗️ Technical Log: HazyNet "Lighthouse" Node Setup**
 
 **Environment:** Ubuntu 22.04 LTS (Headless) | **Hardware:** Dell Laptop (Server)
