@@ -26,7 +26,7 @@ Because we are using **Parquet**, we aren't just reading n (the whole file); we 
 
 **The "O(n) Reality Check"**
 
-| Operation | Traditional Spark | Your HazyNet Setup | Complexity |
+| Operation | Traditional Spark | HazyNet Setup | Complexity |
 | :---- | :---- | :---- | :---- |
 | **Data Seeding** | Sequential Write | Parallelized Partitioning | O(n) |
 | **Tax Calculation** | CPU Row-by-Row | GPU Vectorized | O(n) |
