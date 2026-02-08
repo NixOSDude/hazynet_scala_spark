@@ -1,9 +1,0 @@
-{
-  "name": "System_Test_Notebook",
-  "paragraphs": [
-    {
-      "text": "%spark\nprintln(\"Functional System Check\")",
-      "status": "READY"
-    }
-  ]
-}
