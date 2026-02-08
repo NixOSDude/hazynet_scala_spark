@@ -1,0 +1,252 @@
+{
+  "paragraphs": [
+    {
+      "text": "%spark\r\nimport org.apache.spark.sql.DataFrame\r\nimport org.apache.spark.sql.functions._\r\n\r\n// --- PURE FUNCTIONAL SCALA PROGRAMMING ---\r\n\r\n// PURE LOADER: Specific for Athlete Data\r\nval loadAthleteData: (String) \u003d\u003e DataFrame \u003d (path) \u003d\u003e {\r\n  val DF \u003d spark.read\r\n    .option(\"header\", \"true\")\r\n    .option(\"inferSchema\", \"true\")\r\n    .csv(path)\r\n        \r\n  if (DF.isEmpty) {\r\n    spark.emptyDataFrame\r\n  } else {\r\n    DF\r\n  }\r\n}\r\n\r\n// PURE LOADER: Specific for Regions Data\r\nval loadRegionsData: (String) \u003d\u003e DataFrame \u003d (path) \u003d\u003e {\r\n  val DF \u003d spark.read\r\n    .option(\"header\", \"true\")\r\n    .option(\"inferSchema\", \"true\")\r\n    .csv(path)\r\n  \r\n  if (DF.isEmpty) {\r\n    spark.emptyDataFrame\r\n  } else {\r\n    // Rule: Total If/Else logic using when/otherwise\r\n    // Replacing NA/Nulls in regions with \"none\"\r\n    DF.withColumn(\"notes\",\r\n      when(col(\"notes\").isNull || col(\"notes\") \u003d\u003d\u003d \"NA\", lit(\"none\"))\r\n      .otherwise(col(\"notes\"))\r\n    )\r\n  }\r\n}\r\n\r\n// after running head -n 20 athlete_events.csv (in linux - bash/terminal) I realized that for \"medal\" if\r\n// an athlete never won a medal it has NA - so I decioded to replace with \"no-medal\" for logical readability\r\n// other than that the csv seemed clean and strucured\r\n// SAMPLE: \r\n// \"1\",\"A Dijiang\",\"M\",24,180,80,\"China\",\"CHN\",\"1992 Summer\",1992,\"Summer\",\"Barcelona\",\"Basketball\",\"Basketball Men\u0027s Basketball\",NA\r\n\r\n// Rule: Total If/Else logic using when/otherwise\r\n// Rule: Replace NA with \"no-medal\" (String) and 0 (Numeric)\r\n// Rule: O(n) complexity - single pass over the data\r\n\r\n// --- PURE TRANSFORMER ---\r\n\r\nval sanitizeAthletes: (DataFrame) \u003d\u003e DataFrame \u003d (df) \u003d\u003e {\r\n  if (df.isEmpty) {\r\n    df\r\n  } else {\r\n    df.withColumn(\"Medal\",  when(col(\"Medal\") \u003d\u003d\u003d \"NA\", lit(\"no-medal\")).otherwise(col(\"Medal\")))\r\n      .withColumn(\"Height\", when(col(\"Height\") \u003d\u003d\u003d \"NA\", lit(0)).otherwise(col(\"Height\")))\r\n      .withColumn(\"Weight\", when(col(\"Weight\") \u003d\u003d\u003d \"NA\", lit(0)).otherwise(col(\"Weight\")))\r\n  }\r\n}\r\n\r\n// --- EXECUTION PIPELINE ---\r\n\r\nval athleteRawPath \u003d \"/home/thedude/hazynet-lakehouse/raw/olympic_data/athlete_events.csv\"\r\nval regionsRawPath \u003d \"/home/thedude/hazynet-lakehouse/raw/olympic_data/noc_regions.csv\"\r\n\r\n// Loading using the pure functions\r\nval athleteDF \u003d sanitizeAthletes(loadAthleteData(athleteRawPath))\r\nval regionsDF \u003d loadRegionsData(regionsRawPath)\r\n\r\n// write to cleaned dir on lakehouse\r\nval cleanedAthletePath \u003d \"/home/thedude/hazynet-lakehouse/cleaned/olympic_athletes_functional\"\r\nval cleanedRegionsPath \u003d \"/home/thedude/hazynet-lakehouse/cleaned/olympic_regions_functional\"\r\n\r\nathleteDF.write.mode(\"overwrite\").parquet(cleanedAthletePath)\r\nregionsDF.write.mode(\"overwrite\").parquet(cleanedRegionsPath)\r\n\r\nprintln(s\"SUCCESS: Data structured and saved to $cleanedAthletePath\")\r\nathleteDF.select(\"Name\", \"Medal\", \"Height\").show(5)",
+      "user": "anonymous",
+      "dateUpdated": "2026-02-07 21:31:14.407",
+      "progress": 100,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "SUCCESS: Data structured and saved to /home/thedude/hazynet-lakehouse/cleaned/olympic_athletes_functional\n+--------------------+--------+------+\n|                Name|   Medal|Height|\n+--------------------+--------+------+\n|           A Dijiang|no-medal|   180|\n|            A Lamusi|no-medal|   170|\n| Gunnar Nielsen Aaby|no-medal|     0|\n|Edgar Lindenau Aabye|    Gold|     0|\n|Christine Jacoba ...|no-medal|   185|\n+--------------------+--------+------+\nonly showing top 5 rows\n\nimport org.apache.spark.sql.DataFrame\nimport org.apache.spark.sql.functions._\n\u001b[1m\u001b[34mloadAthleteData\u001b[0m: \u001b[1m\u001b[32mString \u003d\u003e org.apache.spark.sql.DataFrame\u001b[0m \u003d $Lambda$4977/0x000077b8fd384488@3a26379f\n\u001b[1m\u001b[34mloadRegionsData\u001b[0m: \u001b[1m\u001b[32mString \u003d\u003e org.apache.spark.sql.DataFrame\u001b[0m \u003d $Lambda$4978/0x000077b8fd384868@2aa29c75\n\u001b[1m\u001b[34msanitizeAthletes\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame \u003d\u003e org.apache.spark.sql.DataFrame\u001b[0m \u003d $Lambda$4979/0x000077b8fd384c48@3beed9ec\n\u001b[1m\u001b[34mathleteRawPath\u001b[0m: \u001b[1m\u001b[32mString\u001b[0m \u003d /home/thedude/hazynet-lakehouse/raw/olympic_data/athlete_events.csv\n\u001b[1m\u001b[34mregionsRawPath\u001b[0m: \u001b[1m\u001b[32mString\u001b[0m \u003d /home/thedude/hazynet-lakehouse/raw/olympic_data/noc_regions.csv\n\u001b[1m\u001b[34mathleteDF\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m \u003d [ID: int...\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d15"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d16"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d17"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d18"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d19"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d20"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d21"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d22"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d23"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d24"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d25"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d26"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1770513287588_1588451117",
+      "id": "paragraph_1770513287588_1588451117",
+      "dateCreated": "2026-02-07 18:14:47.588",
+      "dateStarted": "2026-02-07 21:31:14.409",
+      "dateFinished": "2026-02-07 21:31:17.189",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%spark\r\nimport org.apache.spark.sql.DataFrame\r\nimport org.apache.spark.sql.functions._\r\n\r\n// PURE FUNCTION: Joining with a Broadcast Hint to maintain O(n)\r\nval enrichAthletesWithRegions: (DataFrame, DataFrame) \u003d\u003e DataFrame \u003d (athletes, regions) \u003d\u003e {\r\n  if (athletes.isEmpty || regions.isEmpty) {\r\n    athletes // Return original if either is empty (Tenet: Always return a value)\r\n  } else {\r\n    // We use \u0027broadcast()\u0027 to force the small table into memory on all cores\r\n    // This avoids the O(n log n) shuffle\r\n    val joined \u003d athletes.join(broadcast(regions), Seq(\"NOC\"), \"left\")\r\n    \r\n    // Tenet: No Nulls. If an athlete\u0027s NOC isn\u0027t in the region table, fill it.\r\n    joined.na.fill(Map(\r\n      \"region\" -\u003e \"unknown-region\",\r\n      \"notes\" -\u003e \"none\"\r\n    ))\r\n  }\r\n}\r\n\r\n// EXECUTION\r\n// We are using the DataFrames we already loaded and cleaned in the previous step\r\nval goldOlympicsDF \u003d enrichAthletesWithRegions(athleteDF, regionsDF)\r\n\r\n// Write to the Gold Layer on the Dell Lakehouse\r\nval goldPath \u003d \"/home/thedude/hazynet-lakehouse/gold/olympics_enriched\"\r\ngoldOlympicsDF.write.mode(\"overwrite\").parquet(goldPath)\r\n\r\nprintln(s\"GOLD LAYER CREATED: $goldPath\")\r\ngoldOlympicsDF.select(\"Name\", \"NOC\", \"region\", \"Medal\").show(10)",
+      "user": "anonymous",
+      "dateUpdated": "2026-02-07 21:34:57.222",
+      "progress": 100,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "GOLD LAYER CREATED: /home/thedude/hazynet-lakehouse/gold/olympics_enriched\n+--------------------+---+-----------+--------+\n|                Name|NOC|     region|   Medal|\n+--------------------+---+-----------+--------+\n|           A Dijiang|CHN|      China|no-medal|\n|            A Lamusi|CHN|      China|no-medal|\n| Gunnar Nielsen Aaby|DEN|    Denmark|no-medal|\n|Edgar Lindenau Aabye|DEN|    Denmark|    Gold|\n|Christine Jacoba ...|NED|Netherlands|no-medal|\n|Christine Jacoba ...|NED|Netherlands|no-medal|\n|Christine Jacoba ...|NED|Netherlands|no-medal|\n|Christine Jacoba ...|NED|Netherlands|no-medal|\n|Christine Jacoba ...|NED|Netherlands|no-medal|\n|Christine Jacoba ...|NED|Netherlands|no-medal|\n+--------------------+---+-----------+--------+\nonly showing top 10 rows\n\nimport org.apache.spark.sql.DataFrame\nimport org.apache.spark.sql.functions._\n\u001b[1m\u001b[34menrichAthletesWithRegions\u001b[0m: \u001b[1m\u001b[32m(org.apache.spark.sql.DataFrame, org.apache.spark.sql.DataFrame) \u003d\u003e org.apache.spark.sql.DataFrame\u001b[0m \u003d $Lambda$5010/0x000077b8fd387650@64985cb6\n\u001b[1m\u001b[34mgoldOlympicsDF\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m \u003d [NOC: string, ID: int ... 15 more fields]\n\u001b[1m\u001b[34mgoldPath\u001b[0m: \u001b[1m\u001b[32mString\u001b[0m \u003d /home/thedude/hazynet-lakehouse/gold/olympics_enriched\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d27"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d28"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d30"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d31"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d33"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1770513651073_2065875045",
+      "id": "paragraph_1770513651073_2065875045",
+      "dateCreated": "2026-02-07 18:20:51.073",
+      "dateStarted": "2026-02-07 21:34:57.224",
+      "dateFinished": "2026-02-07 21:34:59.575",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%spark\r\nimport org.apache.spark.sql.{DataFrame, Column}\r\nimport org.apache.spark.sql.functions._\r\nimport scala.annotation.tailrec\r\n\r\n// 1. Define our target medals\r\nval medalTypes \u003d List(\"Gold\", \"Silver\", \"Bronze\")\r\n\r\n// 2. The Tail-Recursive Function\r\n// Accumulates columns for each medal type in a single pass\r\n@tailrec\r\ndef countMedalsRecursive(df: DataFrame, medals: List[String]): DataFrame \u003d {\r\n  if (medals.isEmpty) {\r\n    df\r\n  } else {\r\n    val medalName \u003d medals.head\r\n    // Add a column that acts as a binary flag (1 if won, 0 if not)\r\n    // Mandatory else: otherwise(lit(0))\r\n    val updatedDf \u003d df.withColumn(s\"is_$medalName\", \r\n      when(col(\"Medal\") \u003d\u003d\u003d medalName, lit(1)).otherwise(lit(0))\r\n    )\r\n    \r\n    // Tail call: passing the updated DF and the remaining list\r\n    countMedalsRecursive(updatedDf, medals.tail)\r\n  }\r\n}\r\n\r\n// 3. Execution\r\n// Step A: Flag the medals using recursion\r\nval flaggedDf \u003d countMedalsRecursive(goldOlympicsDF, medalTypes)\r\n\r\n// Step B: Aggregate at O(n)\r\nval medalTallies \u003d flaggedDf\r\n  .groupBy(\"region\")\r\n  .agg(\r\n    sum(\"is_Gold\").as(\"Gold_Total\"),\r\n    sum(\"is_Silver\").as(\"Silver_Total\"),\r\n    sum(\"is_Bronze\").as(\"Bronze_Total\")\r\n  )\r\n  .na.fill(0) // Tenet: No Nulls\r\n\r\n// 4. Save the Final Analytics\r\nmedalTallies.write.mode(\"overwrite\").parquet(\"/home/thedude/hazynet-lakehouse/gold/medal_tallies_by_region\")\r\n\r\nprintln(\"RECURSIVE TALLY COMPLETE: Metadata-driven aggregation achieved.\")\r\nmedalTallies.orderBy(desc(\"Gold_Total\")).show(10)",
+      "user": "anonymous",
+      "dateUpdated": "2026-02-07 21:36:18.344",
+      "progress": 0,
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "RECURSIVE TALLY COMPLETE: Metadata-driven aggregation achieved.\n+-------+----------+------------+------------+\n| region|Gold_Total|Silver_Total|Bronze_Total|\n+-------+----------+------------+------------+\n|    USA|      2638|        1641|        1358|\n| Russia|      1599|        1170|        1178|\n|Germany|      1301|        1195|        1260|\n|     UK|       678|         739|         651|\n|  Italy|       575|         531|         531|\n| France|       501|         610|         666|\n| Sweden|       479|         522|         535|\n| Canada|       463|         438|         451|\n|Hungary|       432|         332|         371|\n| Norway|       378|         361|         294|\n+-------+----------+------------+------------+\nonly showing top 10 rows\n\nimport org.apache.spark.sql.{DataFrame, Column}\nimport org.apache.spark.sql.functions._\nimport scala.annotation.tailrec\n\u001b[1m\u001b[34mmedalTypes\u001b[0m: \u001b[1m\u001b[32mList[String]\u001b[0m \u003d List(Gold, Silver, Bronze)\n\u001b[1m\u001b[34mcountMedalsRecursive\u001b[0m: \u001b[1m\u001b[32m(df: org.apache.spark.sql.DataFrame, medals: List[String])org.apache.spark.sql.DataFrame\u001b[0m\n\u001b[1m\u001b[34mflaggedDf\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m \u003d [NOC: string, ID: int ... 18 more fields]\n\u001b[1m\u001b[34mmedalTallies\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m \u003d [region: string, Gold_Total: bigint ... 2 more fields]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d35"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d36"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d37"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d39"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d40"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1770513149907_1994624582",
+      "id": "paragraph_1770513149907_1994624582",
+      "dateCreated": "2026-02-07 18:12:29.907",
+      "dateStarted": "2026-02-07 21:36:18.346",
+      "dateFinished": "2026-02-07 21:36:20.338",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%spark\n",
+      "user": "anonymous",
+      "dateUpdated": "2026-02-07 21:36:18.346",
+      "progress": 0,
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1770525378346_642925968",
+      "id": "paragraph_1770525378346_642925968",
+      "dateCreated": "2026-02-07 21:36:18.346",
+      "status": "READY"
+    }
+  ],
+  "name": "Olympic_Data_01",
+  "id": "2MH61PA4M",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.11.0",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false
+  },
+  "info": {}
+}
