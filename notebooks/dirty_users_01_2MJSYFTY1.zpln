@@ -1,0 +1,339 @@
+{
+  "paragraphs": [
+    {
+      "text": "%spark\n\nimport org.apache.spark.sql.functions._\n\nval bronzePath \u003d \"/home/thedude/hazynet-lakehouse/raw/dirty_users.csv\"\n\nval rawDF \u003d spark.read\n  .option(\"header\", \"true\")\n  .option(\"sep\", \"|\")\n  .option(\"inferSchema\", \"true\")\n  .csv(bronzePath)\n  \nval silverDF \u003d rawDF.select(\n  col(\"user_id\").as(\"id\"),\n  \n  when(trim(col(\"name\")) \u003d\u003d\u003d \"Unknown\", \"NA\")\n    .otherwise(\n        initcap(\n          regexp_replace(trim(col(\"name\")), \"\\\\s+\", \" \")\n        )\n    )\n    .as(\"full_name\"),\n  \n  col(\"signup_date\"),\n  \n  when(trim(col(\"active\")) \u003d\u003d\u003d \"1\" || upper(trim(col(\"active\")))  \u003d\u003d\u003d \"TRUE\", true)\n    .otherwise(false)\n    .as(\"is_active\")\n    \n)\n  \nrawDF.show()\nrawDF.printSchema()\n\nsilverDF.show()\nsilverDF.printSchema()",
+      "user": "anonymous",
+      "dateUpdated": "2026-02-09 21:36:32.447",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-------+---------------+-----------+------+\n|user_id|           name|signup_date|active|\n+-------+---------------+-----------+------+\n|    101|   SCOTT baker | 2026-01-01|  TRUE|\n|    102|    ALEX  smith| 2026-02-15| false|\n|    103| jessica JONES | 2025-12-25|     1|\n|    104|        Unknown| 2026-01-10|     0|\n+-------+---------------+-----------+------+\n\nroot\n |-- user_id: integer (nullable \u003d true)\n |-- name: string (nullable \u003d true)\n |-- signup_date: date (nullable \u003d true)\n |-- active: string (nullable \u003d true)\n\n+---+-------------+-----------+---------+\n| id|    full_name|signup_date|is_active|\n+---+-------------+-----------+---------+\n|101|  Scott Baker| 2026-01-01|     true|\n|102|   Alex Smith| 2026-02-15|    false|\n|103|Jessica Jones| 2025-12-25|     true|\n|104|           NA| 2026-01-10|    false|\n+---+-------------+-----------+---------+\n\nroot\n |-- id: integer (nullable \u003d true)\n |-- full_name: string (nullable \u003d true)\n |-- signup_date: date (nullable \u003d true)\n |-- is_active: boolean (nullable \u003d false)\n\nimport org.apache.spark.sql.functions._\n\u001b[1m\u001b[34mbronzePath\u001b[0m: \u001b[1m\u001b[32mString\u001b[0m \u003d /home/thedude/hazynet-lakehouse/raw/dirty_users.csv\n\u001b[1m\u001b[34mrawDF\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m \u003d [user_id: int, name: string ... 2 more fields]\n\u001b[1m\u001b[34msilverDF\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m \u003d [id: int, full_name: string ... 2 more fields]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d37"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d38"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d39"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d40"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1770581435099_1202203140",
+      "id": "paragraph_1770581435099_1202203140",
+      "dateCreated": "2026-02-08 13:10:35.099",
+      "dateStarted": "2026-02-09 21:36:32.448",
+      "dateFinished": "2026-02-09 21:36:32.746",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%spark\nimport org.apache.spark.sql.Dataset\nimport org.apache.spark.sql.functions._\n\ncase class OlympicHost(\n    \n    year: Int,\n    city: String,\n    country: Option[String]\n    \n    )\n    \nval goldPath \u003d \"/home/thedude/hazynet-lakehouse/gold/olympics_enriched\"\nval nocPath \u003d \"/home/thedude/hazynet-lakehouse/raw/olympic_data/noc_regions.csv\"\n\nval nocDF \u003d spark.read\n  .option(\"header\", \"true\")\n  .option(\"lineSep\", \"\\r\")\n  .csv(nocPath)\n  .select(\n      col(\"NOC\"),\n      col(\"region\").as(\"country\")\n  )\n  \n\nval baseDF \u003d spark.read.parquet(goldPath)\n\nval hostDS: Dataset[OlympicHost] \u003d baseDF\n  .join(nocDF, Seq(\"NOC\"), \"left\")\n  .select(\n      col(\"year\").cast(\"int\"),\n      col(\"City\").as(\"city\"),\n      col(\"country\")\n    )\n      .as[OlympicHost]\n  \nhostDS.show()\n\ndef transformhosts (ds:Dataset[OlympicHost]): Dataset[OlympicHost] \u003d {\n    \n    ds\n      .filter(host \u003d\u003e host.year \u003e 2014)\n      .map(host \u003d\u003e host.copy(city \u003d host.city.toUpperCase))\n    \n}",
+      "user": "anonymous",
+      "dateUpdated": "2026-02-09 21:51:24.622",
+      "progress": 100,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----+-----------+-----------+\n|year|       city|    country|\n+----+-----------+-----------+\n|1992|  Barcelona|      China|\n|2012|     London|      China|\n|1920|  Antwerpen|    Denmark|\n|1900|      Paris|    Denmark|\n|1988|    Calgary|Netherlands|\n|1988|    Calgary|Netherlands|\n|1992|Albertville|Netherlands|\n|1992|Albertville|Netherlands|\n|1994|Lillehammer|Netherlands|\n|1994|Lillehammer|Netherlands|\n|1992|Albertville|        USA|\n|1992|Albertville|        USA|\n|1992|Albertville|        USA|\n|1992|Albertville|        USA|\n|1994|Lillehammer|        USA|\n|1994|Lillehammer|        USA|\n|1994|Lillehammer|        USA|\n|1994|Lillehammer|        USA|\n|1992|Albertville|        USA|\n|1992|Albertville|        USA|\n+----+-----------+-----------+\nonly showing top 20 rows\n\nimport org.apache.spark.sql.Dataset\nimport org.apache.spark.sql.functions._\ndefined class OlympicHost\n\u001b[1m\u001b[34mgoldPath\u001b[0m: \u001b[1m\u001b[32mString\u001b[0m \u003d /home/thedude/hazynet-lakehouse/gold/olympics_enriched\n\u001b[1m\u001b[34mnocPath\u001b[0m: \u001b[1m\u001b[32mString\u001b[0m \u003d /home/thedude/hazynet-lakehouse/raw/olympic_data/noc_regions.csv\n\u001b[1m\u001b[34mnocDF\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m \u003d [NOC: string, country: string]\n\u001b[1m\u001b[34mbaseDF\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m \u003d [NOC: string, ID: int ... 15 more fields]\n\u001b[1m\u001b[34mhostDS\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.Dataset[OlympicHost]\u001b[0m \u003d [year: int, city: string ... 1 more field]\n\u001b[1m\u001b[34mtransformhosts\u001b[0m: \u001b[1m\u001b[32m(ds: org.apache.spark.sql.Dataset[OlympicHost])org.apache.spark.sql.Dataset[OlympicHost]\u001b[0m\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d63"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d64"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d66"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1770682198437_702643395",
+      "id": "paragraph_1770682198437_702643395",
+      "dateCreated": "2026-02-09 17:09:58.438",
+      "dateStarted": "2026-02-09 21:51:24.624",
+      "dateFinished": "2026-02-09 21:51:25.104",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%spark\nval finalGoldDS \u003d transformhosts(hostDS)\nfinalGoldDS.show()\nprintln(s\"Records after 2014: ${finalGoldDS.count()}\")",
+      "user": "anonymous",
+      "dateUpdated": "2026-02-09 21:51:35.218",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----+--------------+-----------+\n|year|          city|    country|\n+----+--------------+-----------+\n|2016|RIO DE JANEIRO|    Romania|\n|2016|RIO DE JANEIRO|      Spain|\n|2016|RIO DE JANEIRO|      Spain|\n|2016|RIO DE JANEIRO|      Spain|\n|2016|RIO DE JANEIRO|      Spain|\n|2016|RIO DE JANEIRO|      Spain|\n|2016|RIO DE JANEIRO|      Spain|\n|2016|RIO DE JANEIRO|      Spain|\n|2016|RIO DE JANEIRO|      Italy|\n|2016|RIO DE JANEIRO| Azerbaijan|\n|2016|RIO DE JANEIRO|     France|\n|2016|RIO DE JANEIRO|    Algeria|\n|2016|RIO DE JANEIRO|    Bahrain|\n|2016|RIO DE JANEIRO|Netherlands|\n|2016|RIO DE JANEIRO|       Iraq|\n|2016|RIO DE JANEIRO|    Ireland|\n|2016|RIO DE JANEIRO|    Ireland|\n|2016|RIO DE JANEIRO|        USA|\n|2016|RIO DE JANEIRO|      Egypt|\n|2016|RIO DE JANEIRO|      Egypt|\n+----+--------------+-----------+\nonly showing top 20 rows\n\nRecords after 2014: 13688\n\u001b[1m\u001b[34mfinalGoldDS\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.Dataset[OlympicHost]\u001b[0m \u003d [year: int, city: string ... 1 more field]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d68"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d70"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d71"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1770696002743_25558691",
+      "id": "paragraph_1770696002743_25558691",
+      "dateCreated": "2026-02-09 21:00:02.743",
+      "dateStarted": "2026-02-09 21:51:35.219",
+      "dateFinished": "2026-02-09 21:51:36.029",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%spark\nval participationCounts \u003d finalGoldDS\n  .groupBy(\"country\")\n  .count()\n  .orderBy(desc(\"count\"))\n\nparticipationCounts.show(10)",
+      "user": "anonymous",
+      "dateUpdated": "2026-02-09 21:52:29.955",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+---------+-----+\n|  country|count|\n+---------+-----+\n|      USA|  719|\n|   Brazil|  583|\n|    China|  546|\n|  Germany|  536|\n|Australia|  518|\n|   France|  512|\n|       UK|  478|\n|    Japan|  436|\n|   Russia|  406|\n|   Canada|  405|\n+---------+-----+\nonly showing top 10 rows\n\n\u001b[1m\u001b[34mparticipationCounts\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.Dataset[org.apache.spark.sql.Row]\u001b[0m \u003d [country: string, count: bigint]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d73"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d74"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1770698979346_701045858",
+      "id": "paragraph_1770698979346_701045858",
+      "dateCreated": "2026-02-09 21:49:39.347",
+      "dateStarted": "2026-02-09 21:52:29.957",
+      "dateFinished": "2026-02-09 21:52:30.737",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%spark\n// Define the destination for our final gold insights\nval finalSummaryPath \u003d \"file:///home/thedude/hazynet-lakehouse/gold/participation_summary\"\n\n// Save using our FP tenets (Overwrite mode for idempotency)\nparticipationCounts.write\n  .mode(\"overwrite\")\n  .parquet(finalSummaryPath)\n\nprintln(s\"Specialist Insight saved to: $finalSummaryPath\")\n",
+      "user": "anonymous",
+      "dateUpdated": "2026-02-09 21:53:33.029",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Specialist Insight saved to: file:///home/thedude/hazynet-lakehouse/gold/participation_summary\n\u001b[1m\u001b[34mfinalSummaryPath\u001b[0m: \u001b[1m\u001b[32mString\u001b[0m \u003d file:///home/thedude/hazynet-lakehouse/gold/participation_summary\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d76"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d77"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d78"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d79"
+            },
+            {
+              "jobUrl": "http://172.19.213.155:4040/jobs/job?id\u003d80"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1770699149957_1371836582",
+      "id": "paragraph_1770699149957_1371836582",
+      "dateCreated": "2026-02-09 21:52:29.957",
+      "dateStarted": "2026-02-09 21:53:33.031",
+      "dateFinished": "2026-02-09 21:53:34.359",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%spark\n",
+      "user": "anonymous",
+      "dateUpdated": "2026-02-09 21:53:25.264",
+      "progress": 0,
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1770699205264_1627077179",
+      "id": "paragraph_1770699205264_1627077179",
+      "dateCreated": "2026-02-09 21:53:25.264",
+      "status": "READY"
+    }
+  ],
+  "name": "dirty_users_01",
+  "id": "2MJSYFTY1",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.11.0",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false
+  },
+  "info": {}
+}
