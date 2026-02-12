@@ -85,7 +85,3 @@ sleep 3 && /opt/spark/bin/spark-submit \\
 * **Performance:** 41M rows successfully engineer and cache in **\~6 seconds** using this architecture.
 
 ---
-
-**Everything is documented and saved.**
-
-Would you like me to generate a **PDF-ready markdown summary** of the XGBoost training results once the model finishes converging on those 41 million rows?
