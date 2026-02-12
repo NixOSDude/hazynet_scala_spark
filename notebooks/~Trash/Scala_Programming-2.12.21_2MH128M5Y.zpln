@@ -1,0 +1,88 @@
+{
+  "paragraphs": [
+    {
+      "user": "anonymous",
+      "progress": 0,
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1770850071427_1561608952",
+      "id": "paragraph_1770850071427_1561608952",
+      "dateCreated": "2026-02-11 15:47:51.427",
+      "status": "READY"
+    },
+    {
+      "text": "def max(x: Int, y: Int) \u003d\nif (x \u003e y)\nx else y\n\nmax(7,8)",
+      "user": "anonymous",
+      "dateUpdated": "2026-02-11 15:52:24.704",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mmax\u001b[0m: \u001b[1m\u001b[32m(x: Int, y: Int)Int\u001b[0m\n\u001b[1m\u001b[34mres4\u001b[0m: \u001b[1m\u001b[32mInt\u001b[0m \u003d 8\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1770850075084_1993088654",
+      "id": "paragraph_1770850075084_1993088654",
+      "dateCreated": "2026-02-11 15:47:55.084",
+      "dateStarted": "2026-02-11 15:52:24.706",
+      "dateFinished": "2026-02-11 15:52:24.792",
+      "status": "FINISHED"
+    },
+    {
+      "user": "anonymous",
+      "progress": 0,
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1770850093440_1659031669",
+      "id": "paragraph_1770850093440_1659031669",
+      "dateCreated": "2026-02-11 15:48:13.440",
+      "status": "READY"
+    }
+  ],
+  "name": "Scala_Programming-2.12.21",
+  "id": "2MH128M5Y",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.11.0",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false
+  },
+  "info": {}
+}
