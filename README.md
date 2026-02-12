@@ -1,4 +1,3 @@
-cat << 'EOF' > README.md
 # 🛡️ Project HazyNet: NYC Taxi Private Cloud Lakehouse 🚀
 
 An authentic, industrial-grade Big Data pipeline built with **Scala 2.12**, **Apache Spark 3.x**, and a strict adherence to **Pure Functional Programming (FP)**. This project leverages a custom-built hybrid cloud to process 100GB+ of NYC Taxi data.
